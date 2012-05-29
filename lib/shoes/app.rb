@@ -6,6 +6,12 @@ module Shoes
   end
   
   class App
+    def initialize
+      @shell = Shoes.backend::App.new
+    end
+
+    attr_reader :shell
+
     def check
       Shoes::Check.new self
     end

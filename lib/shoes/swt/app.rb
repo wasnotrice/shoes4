@@ -1,9 +1,11 @@
 module Shoes
-  class App
-    def initialize
-      @shell = Swt::Shell.new Swt::Display.new
+  module Swt
+    class App
+      def initialize
+        @real = ::Swt::Widgets::Shell.new Swt.display
+      end
+      attr_reader :real
     end
-    attr_reader :shell
   end
 end
 
