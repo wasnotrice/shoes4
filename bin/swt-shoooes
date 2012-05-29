@@ -1,0 +1,11 @@
+#!/usr/bin/env jruby --1.9 -J-XstartOnFirstThread
+require 'rubygems'
+
+$:<< "lib"
+
+require 'shoes'
+Shoes.backend = :SWT
+
+require ARGV[0]
+
+exit 0
