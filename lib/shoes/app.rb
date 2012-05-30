@@ -1,13 +1,15 @@
 module Shoes
   def self.app &blk
-    App.new.tap do |s|
-      s.instance_eval &blk
-    end
+    App.new &blk
   end
   
   class App
-    def check
-      Shoes::Check.new self
+    include ElementMethods
+    
+    def initialize &blk
+      gui_init
+      instance_eval &blk
+      gui_open
     end
   end
 end
