@@ -4,12 +4,13 @@ module Shoes
   end
   
   class App
-    include ElementMethods
+    include Shoes::ElementMethods
     
     def initialize &blk
-      gui_init
+      @gui = Shoes.backend::App.new(Swt.display)
       instance_eval &blk
-      gui_open
+      @gui.open
     end
+    attr_reader :gui
   end
 end

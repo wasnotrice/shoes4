@@ -1,11 +1,11 @@
-module Shoes::Swt::App
-  def gui_init
-    @shell = Swt::Widgets::Shell.new Swt::Widgets::Display.new
+class Shoes::Swt::App
+  def initialize(display)
+    @shell = Swt::Widgets::Shell.new display
   end
     
   attr_reader :shell
     
-  def gui_open
+  def open
     # bla bla bla
   end
 end
