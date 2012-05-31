@@ -1,6 +1,6 @@
-module Shoes::Swt::App
+module Shoes::Swing::App
   def gui_init
-    @shell = Swt::Widgets::Shell.new Swt::Widgets::Display.new
+    @shell = 'create Swing object'
   end
     
   attr_reader :shell
