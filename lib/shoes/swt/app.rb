@@ -12,7 +12,7 @@ module Shoes
       def initialize dsl
         @dsl = dsl
         @real = ::Swt::Widgets::Shell.new(::Swt.display, main_window_style).tap do |shell|
-          shell.set_image ::Swt::Graphics::Image.new(::Swt.display, SHOES_ICON)
+          shell.set_image ::Swt::Graphics::Image.new(::Swt.display, Java::JavaIo::FileInputStream.new(Java::JavaIo::File.new(Java::JavaNet::URI.new('file://' + SHOES_ICON))))
           shell.setText(@dsl.app_title)
           shell.addListener(::Swt::SWT::Close, main_window_on_close)
           shell.background_mode = ::Swt::SWT::INHERIT_DEFAULT
