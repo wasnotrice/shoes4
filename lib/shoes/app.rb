@@ -1,4 +1,5 @@
 require 'shoes/element_methods'
+require 'pathname'
 require 'shoes/color'
 
 def window(*a, &b)
@@ -7,7 +8,7 @@ end
 
 
 module Shoes
-  SHOES_ICON = File.join(File.dirname(__FILE__), '..', '..', 'static', 'shoes-icon.png')
+  SHOES_ICON = Pathname.new(File.join(File.dirname(__FILE__), '..', '..', 'static', 'shoes-icon.png')).cleanpath.to_s
 
   def self.app(opts={}, &blk)
     Shoes::App.new(opts, &blk)
