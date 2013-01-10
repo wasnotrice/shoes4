@@ -49,8 +49,8 @@ module Shoes
     def initialize(opts={}, &blk)
       opts = DEFAULT_OPTIONS.merge(opts)
 
-      self.width      = opts[:width]
-      self.height     = opts[:height]
+      #self.width      = opts[:width]
+      #self.height     = opts[:height]
       self.app_title  = opts[:title]
       self.resizable  = opts[:resizable]
       self.opts       = opts
@@ -62,7 +62,7 @@ module Shoes
       @mouse_button, @mouse_pos = 0, [0, 0]
       set_margin
 
-      @gui = Shoes.configuration.backend::App.new @app
+      @gui = Shoes.configuration.backend::App.new @app, opts[:width], opts[:height]
 
       blk = $urls[/^#{'/'}$/] unless blk
       @top_slot = Flow.new self, {app: @app, left: 0, top: 0, width: @width, height: @height}, &blk
@@ -72,11 +72,11 @@ module Shoes
     end
 
     def width
-      @top_slot ? @gui.width : @width
+      @gui.width
     end
 
     def height
-      @top_slot ? @gui.height : @height
+      @gui.height
     end
 
     def left; 0 end

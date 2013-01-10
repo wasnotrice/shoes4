@@ -11,12 +11,12 @@ module Shoes
 
       attr_reader :dsl, :real, :shell
 
-      def initialize dsl
+      def initialize dsl, width, height
         @dsl = dsl
         ::Swt::Widgets::Display.app_name = @dsl.app_title
         @background = Color.new(@dsl.opts[:background])
-        initialize_shell()
-        initialize_real()
+        @shell = initialize_shell
+        @real = initialize_real(width, height)
         ::Shoes::Swt.register self
 
         attach_event_listeners
@@ -56,7 +56,7 @@ module Shoes
       def main_app?
         ::Shoes::Swt.main_app.equal? self
       end
-      
+
       def flush
         @dsl.top_slot.contents_alignment @dsl.top_slot
       end
@@ -64,7 +64,7 @@ module Shoes
       def scroll_top
         @real.getLocation.y
       end
-      
+
       def scroll_top=(n)
         @real.setLocation 0, -n
         @shell.getVerticalBar.setSelection n
@@ -86,17 +86,19 @@ module Shoes
       end
 
       def initialize_shell
-        @shell = ::Swt::Widgets::Shell.new(::Swt.display, main_window_style)
-        @shell.image = ::Swt::Graphics::Image.new(::Swt.display, SHOES_ICON)
-        @shell.text = (@dsl.app_title)
-        @shell.background_mode = ::Swt::SWT::INHERIT_DEFAULT
-        @shell.background = @background.real
+        ::Swt::Widgets::Shell.new(::Swt.display, main_window_style).tap do |shell|
+          shell.image = ::Swt::Graphics::Image.new(::Swt.display, SHOES_ICON)
+          shell.text = (@dsl.app_title)
+          shell.background_mode = ::Swt::SWT::INHERIT_DEFAULT
+          shell.background = @background.real
+        end
       end
 
-      def initialize_real
-        @real = ::Swt::Widgets::Composite.new(@shell, ::Swt::SWT::TRANSPARENT)
-        @real.setSize(@dsl.width - @shell.getVerticalBar.getSize.x, @dsl.height)
-        @real.setLayout ShoesLayout.new
+      def initialize_real(width, height)
+        ::Swt::Widgets::Composite.new(@shell, ::Swt::SWT::TRANSPARENT).tap do |real|
+          real.setSize(width - @shell.getVerticalBar.getSize.x, height)
+          real.setLayout ShoesLayout.new
+        end
       end
 
       def attach_event_listeners
@@ -161,7 +163,7 @@ module Shoes
         # do nothing
       end
     end
-    
+
     class SelectionListener
       def initialize app, vb
         @app, @vb = app, vb

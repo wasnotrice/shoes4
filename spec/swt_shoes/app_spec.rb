@@ -14,7 +14,7 @@ describe Shoes::Swt::App do
                                         :height => 0,
                                         :app_title => 'mock') }
 
-  subject { Shoes::Swt::App.new(app) }
+  subject { Shoes::Swt::App.new(app, 0, 0) }
 
   before :each do
     Shoes::Swt.unregister_all
@@ -50,7 +50,7 @@ describe Shoes::Swt::App do
     end
 
     it "should return a bitmask that represents not being resizable" do
-      resizable = Shoes::Swt::App.new app_unresizable
+      resizable = Shoes::Swt::App.new app_unresizable, 0, 0
       resizable.send(:main_window_style).should eq(BASE_BITMASK & ~Swt::SWT::RESIZE )
     end
   end
