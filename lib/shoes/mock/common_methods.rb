@@ -7,6 +7,10 @@ module Shoes
       def move(left, top)
         @left, @top = left, top
       end
+
+      def toggle()
+        @hidden = !@hidden
+      end
     end
   end
 end

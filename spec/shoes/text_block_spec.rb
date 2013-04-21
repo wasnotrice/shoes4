@@ -66,4 +66,15 @@ describe Shoes::TextBlock do
     end
 
   end
+
+  describe "when visible" do
+    it "should not be hidden" do
+      subject.hidden.should be_false
+    end
+
+    it "should toggle to hidden" do
+      subject.toggle
+      subject.hidden.should be_true
+    end
+  end
 end
