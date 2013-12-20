@@ -12,7 +12,7 @@ describe Shoes::EditBox do
   it_behaves_like "movable object"
   it_behaves_like "an element that can respond to change"
   it_behaves_like "object with state"
-
+  it_behaves_like "input box"
 
   it { should respond_to :focus }
   it { should respond_to :text  }

@@ -8,16 +8,17 @@ class Shoes
       include Common::UpdatePosition
       include ::Shoes::BackendDimensionsDelegations
 
-      attr_reader :real, :dsl
+      attr_reader :real, :dsl, :text_options
 
       def initialize(dsl, parent, text_options)
         @dsl          = dsl
         @parent       = parent
         @text_options = text_options
+        @last_text    = dsl.initial_text.to_s
 
         @real = ::Swt::Widgets::Text.new(@parent.real, text_options)
         @real.set_size dsl.element_width, dsl.element_height
-        @real.set_text dsl.initial_text.to_s
+        @real.set_text @last_text
         @real.add_modify_listener do |event|
           source = event.source
 

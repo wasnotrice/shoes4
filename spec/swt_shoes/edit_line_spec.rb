@@ -4,13 +4,14 @@ describe Shoes::Swt::EditLine do
   let(:container) { real }
   let(:gui)    { double("gui", real: real) }
   let(:app)    { double("app", gui: gui) }
+  let(:text)   { "Cheese plate" }
   let(:dsl) { double('dsl', app: app,
                      visible?: true,
                      element_width: 80, element_height: 22,
-                     initial_text: 'YOLO',
+                     initial_text: text,
                      secret?: true).as_null_object }
   let(:parent) { double('parent') }
-  let(:real) { double('real', is_disposed?: false, disposed?: false).as_null_object }
+  let(:real) { double('real', is_disposed?: false, disposed?: false, text: text).as_null_object }
 
   subject { Shoes::Swt::EditLine.new dsl, parent }
 
@@ -23,23 +24,36 @@ describe Shoes::Swt::EditLine do
   it_behaves_like "movable element"
   it_behaves_like "clearable native element"
   it_behaves_like "togglable"
+  it_behaves_like "swt input box"
 
   describe "#initialize" do
-    it "sets text on real element" do
-      real.should_receive(:text=).with("some text")
-      subject.text = "some text"
-    end
-
-    it "should set up a listener that delegates change events" do
-      dsl.should_receive(:call_change_listeners)
-      real.should_receive(:add_modify_listener) do |&blk|
-        blk.call()
-      end
+    it "adds a modify listener" do
+      real.should_receive(:add_modify_listener)
       subject
     end
   end
 
   describe "responding to change" do
+    let(:source) { double("source", class: Java::OrgEclipseSwtWidgets::Text) }
+    let(:event) { double("event", source: source, class: Java::OrgEclipseSwtEvents::ModifyEvent) }
+
+    context "when text has changed" do
+      it "sets up a listener that delegates change events" do
+        source.stub(:text) { "Prime rib" }
+        real.should_receive(:add_modify_listener) { |&arg| arg.call(event) }
+        dsl.should_receive(:call_change_listeners)
+        subject
+      end
+    end
+
+    context "when text has NOT changed" do
+      it "does not call other change listeners" do
+        source.stub(:text) { text }
+        real.should_receive(:add_modify_listener) { |&arg| arg.call(event) }
+        dsl.should_not_receive(:call_change_listeners)
+        subject
+      end
+    end
   end
 
   describe ":secret option" do
