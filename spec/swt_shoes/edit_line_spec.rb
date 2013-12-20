@@ -28,7 +28,7 @@ describe Shoes::Swt::EditLine do
 
   describe "#initialize" do
     it "adds a modify listener" do
-      real.should_receive(:add_modify_listener)
+      expect(real).to receive(:add_modify_listener)
       subject
     end
   end
