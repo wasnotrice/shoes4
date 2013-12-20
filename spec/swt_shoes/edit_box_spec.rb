@@ -39,8 +39,8 @@ describe Shoes::Swt::EditBox do
     context "when text has changed" do
       it "sets up a listener that delegates change events" do
         source.stub(:text) { "Prime rib" }
-        real.should_receive(:add_modify_listener) { |&arg| arg.call(event) }
-        dsl.should_receive(:call_change_listeners)
+        expect(real).to receive(:add_modify_listener) { |&arg| arg.call(event) }
+        expect(dsl).to receive(:call_change_listeners)
         subject
       end
     end
@@ -48,8 +48,8 @@ describe Shoes::Swt::EditBox do
     context "when text has NOT changed" do
       it "does not call other change listeners" do
         source.stub(:text) { text }
-        real.should_receive(:add_modify_listener) { |&arg| arg.call(event) }
-        dsl.should_not_receive(:call_change_listeners)
+        expect(real).to receive(:add_modify_listener) { |&arg| arg.call(event) }
+        expect(dsl).not_to receive(:call_change_listeners)
         subject
       end
     end
