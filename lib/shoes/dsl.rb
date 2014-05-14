@@ -385,11 +385,13 @@ EOS
       end
     end
 
-    def fg(*texts, color)
+    def fg(*texts)
+      color = texts.pop
       Shoes::Span.new texts, { stroke: pattern(color) }
     end
 
-    def bg(*texts, color)
+    def bg(*texts)
+      color = texts.pop
       Shoes::Span.new texts, { fill: pattern(color) }
     end
 
