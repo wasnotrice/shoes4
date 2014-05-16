@@ -1,15 +1,24 @@
 require 'pathname'
-require 'tmpdir'
-require 'fileutils'
+# Opal barfs on these
+# require 'tmpdir'
+# require 'fileutils'
 require 'forwardable'
 
 require 'shoes/common/registration'
 
 class Shoes
-  PI                  = Math::PI
+  if RUBY_ENGINE == 'opal'
+    PI = 3.141592658
+  else
+    PI = Math::PI
+  end
   TWO_PI              = 2 * PI
   HALF_PI             = 0.5 * PI
-  DIR                 = Pathname.new(__FILE__).join("../..").realpath.to_s
+  if RUBY_ENGINE == 'opal'
+    DIR = '.'
+  else
+    DIR                 = Pathname.new(__FILE__).join("../..").realpath.to_s
+  end
   LOG                 = []
   LEFT_MOUSE_BUTTON   = 1
   MIDDLE_MOUSE_BUTTON = 2
@@ -45,6 +54,7 @@ class Shoes
     # @param name [String|Symbol] The name, such as :swt or :mock
     # @return The backend
     def load_backend(name)
+      puts("Loading #{name} backend")
       begin
         require "shoes/#{name.to_s.downcase}"
         Shoes.const_get(name.to_s.capitalize)
@@ -97,8 +107,11 @@ require 'shoes/button'
 require 'shoes/configuration'
 require 'shoes/color'
 require 'shoes/dialog'
-require 'shoes/download'
-require 'shoes/font'
+# Opal error: couldn't find file 'open-uri'
+# require 'shoes/download'
+# Opal error: Uncaught NameError: uninitialized constant Object::DIR
+# Not sure if this is Shoes::DIR or Dir.glob
+# require 'shoes/font'
 require 'shoes/gradient'
 require 'shoes/image'
 require 'shoes/image_pattern'
@@ -107,7 +120,9 @@ require 'shoes/line'
 require 'shoes/link'
 require 'shoes/link_hover'
 require 'shoes/list_box'
-require 'shoes/logger'
+# Opal error: Uncaught NameError: uninitialized constant Object::Dir
+# As in Dir.glob
+# require 'shoes/logger'
 require 'shoes/manual'
 require 'shoes/oval'
 require 'shoes/point'
