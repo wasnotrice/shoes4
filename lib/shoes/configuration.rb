@@ -18,7 +18,7 @@ class Shoes
         if caller.any? {|path| path =~ /rspec/}
           :mock
         elsif RUBY_ENGINE == 'opal'
-          :opal
+          :atom
         else
           :swt
         end
