@@ -14,7 +14,9 @@ class Shoes
       @parent             = parent
       @app                = app
       @opts               = opts
-      @font               = @app.font || DEFAULT_TEXTBLOCK_FONT
+      # Fonts not working yet
+      # @font               = @app.font || DEFAULT_TEXTBLOCK_FONT
+      @font               = DEFAULT_TEXTBLOCK_FONT
       @font_size          = @opts[:size] || font_size
       @contents           = texts
       @text               = texts.map(&:to_s).join
