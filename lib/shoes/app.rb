@@ -306,12 +306,14 @@ class Shoes
     end
 
     def add_console
-      console = Proc.new do 
-        keypress do |key|
-          ::Shoes::Logger.setup if key == :"alt_/"
+      unless RUBY_ENGINE == 'opal'
+        console = Proc.new do 
+          keypress do |key|
+            ::Shoes::Logger.setup if key == :"alt_/"
+          end
         end
+        @app.instance_eval &console
       end
-      @app.instance_eval &console
     end
 
     def inspect
