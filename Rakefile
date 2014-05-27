@@ -2,6 +2,9 @@ require 'rake'
 require 'rake/clean'
 require 'rubygems/package_task'
 require 'rspec/core/rake_task'
+require 'bundler/gem_tasks'
+
+require_relative 'tasks/changelog'
 
 PACKAGE_DIR = 'pkg'
 SAMPLES_DIR = "samples"
@@ -152,7 +155,7 @@ namespace :samples do
   end
 
   def run_sample(sample_name, index, total)
-    print "Running #{sample_name} (#{index + 1} of #{total})...quit to run next sample"
+    puts "Running #{sample_name} (#{index + 1} of #{total})...quit to run next sample"
     system "bin/shoes #{sample_name}"
   end
 

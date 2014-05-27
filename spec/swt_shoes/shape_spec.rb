@@ -10,15 +10,20 @@ describe Shoes::Swt::Shape do
     let(:ancestors) { subject.class.ancestors.map(&:name) }
 
     it "uses Shoes::Swt" do
-      ancestors.should include('Shoes::Swt::Shape')
+      expect(ancestors).to include('Shoes::Swt::Shape')
       subject
     end
 
-    its(:dsl) { should be(dsl) }
+    its(:dsl) { is_expected.to be(dsl) }
   end
 
   it_behaves_like "Swt::Shape"
   it_behaves_like "paintable"
+
+  it "properly disposes" do
+    expect(subject.transform).to receive(:dispose)
+    subject.dispose
+  end
 
   describe "Swt element" do
     let(:element) { double("element") }

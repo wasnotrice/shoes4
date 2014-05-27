@@ -11,13 +11,15 @@ $untracked_disposals = {}
     ::Swt::Graphics::Color,
     ::Swt::Graphics::Cursor,
     ::Swt::Graphics::Font,
-    ::Swt::Graphics::GC,
     ::Swt::Graphics::Image,
     ::Swt::Graphics::Path,
     ::Swt::Graphics::Pattern,
     ::Swt::Graphics::Region,
     ::Swt::Graphics::TextLayout,
     ::Swt::Graphics::Transform,
+
+    # Excluded GC as we don't create any directly and it's quite noisy
+    #::Swt::Graphics::GC,
   ]
 
   create_key = ->(klass, backtrace) do
@@ -81,4 +83,11 @@ at_exit do
   puts
   puts "Untracked disposal totals:"
   puts totals.call($untracked_disposals)
+end
+
+# Register an internal keystroke for closing the app, making sure to clear
+# out the contents first (to avoid false positives for still-exiting elements.
+Shoes::InternalApp.add_global_keypress(:'control_alt_q') do
+  clear
+  quit
 end

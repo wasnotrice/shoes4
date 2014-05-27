@@ -1,6 +1,5 @@
 class Shoes
   class Dimension
-    attr_writer :extent
     attr_reader :parent
     attr_accessor :absolute_start
     protected :parent # we shall not mess with parent,see #495
@@ -20,16 +19,13 @@ class Shoes
     end
 
     def start
-      value = @start || relative_to_parent_start
-      if start_as_center?
-        adjust_start_for_center(value)
-      else
-        value
-      end
+      value = basic_start_value
+      value = adjust_start_for_center(value) if start_as_center?
+      value
     end
 
     def end
-      @end || relative_to_parent_end
+      @end || report_relative_to_parent_end
     end
 
     def extent
@@ -60,7 +56,7 @@ class Shoes
         extent - (margin_start + margin_end)
       end
     end
-    
+
     def element_extent=(value)
       self.extent = if value.nil?
                       nil
@@ -102,12 +98,14 @@ class Shoes
     # For... reasons it is important to have the value of the instance variable
     # set to nil if it's not modified and then return a default value on the
     # getter... reason being that for ParentDimensions we need to be able to
-    # figure out if a value has been modified or if we should consulte the
+    # figure out if a value has been modified or if we should consult the
     # parent value - see ParentDimension implementation
     [:margin_start, :margin_end, :displace_start].each do |method|
       define_method method do
         instance_variable_name = '@' + method.to_s
-        instance_variable_get(instance_variable_name) || 0
+        value = instance_variable_get(instance_variable_name) || 0
+        value = calculate_relative value if is_relative? value
+        value
       end
     end
 
@@ -122,8 +120,21 @@ class Shoes
     end
 
     private
+    def basic_start_value
+      value = @start
+      value = calculate_relative value if is_relative?(value)
+      value = report_relative_to_parent_start if value.nil?
+      value
+    end
+
     def is_relative?(result)
-      result.is_a?(Float)
+      # as the value is relative to the parent values bigger than one don't
+      # make much sense and are problematic. E.g. through calculations users
+      # might end up with values like 5.14 meaning 5 pixel which would get
+      # interpreted as 514% of the parent
+      # Also check for existance of parent because otherwise relative
+      # calculation makes no sense
+      result.is_a?(Float) && result <= 1 && @parent
     end
 
     def calculate_relative(result)
@@ -175,16 +186,16 @@ class Shoes
       input.is_a?(String) && input.match(NUMBER_REGEX)
     end
 
-    def relative_to_parent_start
-      if element_start && parent.element_start
+    def report_relative_to_parent_start
+      if element_start && parent && parent.element_start
         element_start - parent.element_start
       else
         nil
       end
     end
 
-    def relative_to_parent_end
-      if element_end && parent.element_end
+    def report_relative_to_parent_end
+      if element_end && parent && parent.element_end
         parent.element_end - element_end
       else
         nil

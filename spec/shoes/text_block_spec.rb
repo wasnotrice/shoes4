@@ -57,6 +57,16 @@ describe Shoes::TextBlock do
       text_block.replace "Goodbye Cruel World, ", text_link
       expect(text_block.text).to eq("Goodbye Cruel World, Hello")
     end
+
+    it "updates contents" do
+      text_block.replace("Later Gator")
+      expect(text_block.contents).to eq(["Later Gator"])
+    end
+
+    it "updates text styles" do
+      text_block.replace "Later Gator"
+      expect(text_block.text_styles).to be_empty
+    end
   end
 
   describe "#contents" do
@@ -142,7 +152,7 @@ describe Shoes::TextBlock do
 
   describe "width" do
     before(:each) do
-      parent.stub(:width)         { 300 }
+      parent.stub(:element_width) { 300 }
       parent.stub(:absolute_left) { 0 }
     end
 
@@ -152,6 +162,11 @@ describe Shoes::TextBlock do
       it "delegates to calculated width" do
         subject.calculated_width = 240
         expect(subject.width).to eql 240
+      end
+
+      it "delegates to calculated height" do
+        subject.calculated_height = 240
+        expect(subject.height).to eql 240
       end
 
       it "bases desired width off parent" do

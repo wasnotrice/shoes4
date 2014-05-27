@@ -6,9 +6,9 @@ describe Shoes::App do
   subject(:app) { Shoes::App.new(opts, &input_blk) }
 
   it_behaves_like "DSL container"
-  it { should respond_to :clipboard }
-  it { should respond_to :clipboard= }
-  it { should respond_to :owner }
+  it { is_expected.to respond_to :clipboard }
+  it { is_expected.to respond_to :clipboard= }
+  it { is_expected.to respond_to :owner }
 
   # For Shoes 3 compatibility
   it "exposes self as #app" do
@@ -24,7 +24,7 @@ describe Shoes::App do
 
     it "initializes style hash", :qt do
       style = Shoes::App.new.style
-      style.class.should eq(Hash)
+      expect(style.class).to eq(Hash)
     end
 
     context "console" do
@@ -35,7 +35,6 @@ describe Shoes::App do
       let(:defaults) { Shoes::InternalApp::DEFAULT_OPTIONS }
 
       it "sets width", :qt do
-        subject.width.should == defaults[:width]
         expect(subject.width).to eq defaults[:width]
       end
 
@@ -59,7 +58,7 @@ describe Shoes::App do
         end
 
         it "is resizable", :qt do
-          expect(internal_app.resizable).to be_true
+          expect(internal_app.resizable).to be_truthy
         end
       end
     end
@@ -83,7 +82,7 @@ describe Shoes::App do
         end
 
         it "sets resizable", :qt do
-          expect(internal_app.resizable).to be_false
+          expect(internal_app.resizable).to be_falsey
         end
       end
 
@@ -109,66 +108,72 @@ describe Shoes::App do
       end
     end
   end
+  
+  describe "style with defaults" do
+    let(:default_styles) { Shoes::Common::Style::DEFAULT_STYLES }
 
-  describe "style" do
-    let(:black) { Shoes::COLORS[:black] }
-    let(:goldenrod) { Shoes::COLORS[:goldenrod] }
-    let(:defaults) { {stroke: black, strokewidth: 1} }
-
-    it "sets defaults" do
-      expect(app.style).to eq(defaults)
+    it "sets app defaults" do
+      expect(app.style).to eq(default_styles)
     end
 
     it "merges new styles with existing styles" do
-      new_styles = { strokewidth: 4 }
-      app.style new_styles
-      expect(app.style).to eq(defaults.merge(new_styles))
+      subject.style strokewidth: 4
+      expect(subject.style).to eq(default_styles.merge(strokewidth: 4))
+    end
+    
+    default_styles = Shoes::Common::Style::DEFAULT_STYLES
+
+    default_styles.each do |key, value|
+      describe "#{key}" do
+        it "defaults to #{value}" do
+          expect(subject.style[key]).to eq(value)
+        end
+
+        it "passes default to objects" do
+          expect(subject.line(0, 100, 100, 0).style[key]).to eq(value)
+        end
+
+      end
     end
 
-    describe "strokewidth" do
-      it "defaults to 1" do
-        subject.style[:strokewidth].should eq(1)
-      end
-
-      it "passes default to objects" do
-        subject.line(0, 100, 100, 0).style[:strokewidth].should eq(1)
-      end
-
-      it "passes new values to objects" do
-        subject.strokewidth 10
-        subject.line(0, 100, 100, 0).style[:strokewidth].should eq(10)
-      end
-    end
-
-    describe "stroke" do
-      it "defaults to black" do
-        subject.style[:stroke].should eq(black)
-      end
-
-      it "passes default to objects" do
-        subject.oval(100, 100, 100).style[:stroke].should eq(black)
-      end
-
-      it "passes new value to objects" do
-        subject.stroke goldenrod
-        subject.oval(100, 100, 100).style[:stroke].should eq(goldenrod)
-      end
-    end
 
     describe "default styles" do
-      it "is independent among Shoes::App instances" do
+      it "are independent among Shoes::App instances" do
         app1 = Shoes::App.new
         app2 = Shoes::App.new
 
         app1.strokewidth 10
-        app1.line(0, 100, 100, 0).style[:strokewidth].should == 10
+        expect(app1.line(0, 100, 100, 0).style[:strokewidth]).to eq(10)
 
         # .. but does not affect app2
-        app2.line(0, 100, 100, 0).style[:strokewidth].should_not == 10
+        expect(app2.line(0, 100, 100, 0).style[:strokewidth]).not_to eq(10)
+     
       end
     end
   end
-  
+
+  describe "app-level style setter" do
+    let(:goldenrod) { Shoes::COLORS[:goldenrod] }
+    
+    pattern_styles = Shoes::DSL::PATTERN_APP_STYLES
+    other_styles = Shoes::DSL::OTHER_APP_STYLES
+
+    pattern_styles.each do |style|
+      it "sets #{style} for objects" do
+        subject.public_send(style, goldenrod)
+        expect(subject.line(0, 100, 100, 0).style[style]).to eq(goldenrod) 
+      end
+    end
+
+    other_styles.each do |style|
+      it "sets #{style} for objects" do
+        subject.public_send(style, 'val')
+        expect(subject.line(0, 100, 100, 0).style[style]).to eq('val') 
+      end
+    end
+
+  end
+
   describe "connecting with gui" do 
     let(:gui) { app.instance_variable_get(:@__app__).gui }
 
@@ -207,7 +212,7 @@ describe Shoes::App do
     it 'starts with self as the execution context' do
       my_self = nil
       app = Shoes.app do my_self = self end
-      my_self.should eq app
+      expect(my_self).to eq app
     end
   end
 
@@ -215,7 +220,7 @@ describe Shoes::App do
     let(:input_blk) {Proc.new do append do para 'Hi' end end}
 
     it 'understands append' do
-      subject.should respond_to :append
+      expect(subject).to respond_to :append
     end
 
     it 'should receive a call to what is called in the append block' do
@@ -226,7 +231,7 @@ describe Shoes::App do
 
   describe '#resize' do
     it 'understands resize' do
-      subject.should respond_to :resize
+      expect(subject).to respond_to :resize
     end
   end
 
@@ -236,7 +241,7 @@ describe Shoes::App do
 
       context 'with defaults' do
         it 'does not start as fullscreen' do
-          expect(internal_app.start_as_fullscreen?).to be_false
+          expect(internal_app.start_as_fullscreen?).to be_falsey
         end
       end
 
@@ -244,7 +249,7 @@ describe Shoes::App do
         let(:opts) { {fullscreen: true} }
 
         it 'starts as fullscreen ' do
-          expect(internal_app.start_as_fullscreen?).to be_true
+          expect(internal_app.start_as_fullscreen?).to be_truthy
         end
       end
     end
@@ -297,7 +302,7 @@ describe Shoes::App do
     it 'adds the child to the own contents when there is no top_slot' do
       internal_app.stub top_slot: nil
       internal_app.add_child child
-      internal_app.contents.should include child
+      expect(internal_app.contents).to include child
     end
   end
 
@@ -346,23 +351,54 @@ describe Shoes::App do
     end
   end
 
+  describe "#parent" do
+    context "when parent is top slot" do
+      it "returns the top_slot if no slot is wrapped around" do
+        my_parent = nil
+        app = Shoes.app do
+          flow do
+            my_parent = parent
+          end
+        end
+        expect(my_parent).to eq app.instance_variable_get(:@__app__).top_slot
+      end
+    end
+
+    context "when parent is not the top slot" do
+      it 'returns the current parent' do
+        my_parent = nil
+        my_stack  = nil
+        app = Shoes.app do
+          my_stack = stack do
+            flow do
+              my_parent = parent
+            end
+          end
+        end
+
+        expect(my_parent).to eq my_stack
+      end
+    end
+
+  end
+
   describe 'DELEGATE_METHODS' do
     subject {Shoes::App::DELEGATE_METHODS}
 
     describe 'does not include general ruby object methods' do
-      it {should_not include :new, :initialize}
+      it {is_expected.not_to include :new, :initialize}
     end
 
     describe 'it has access to Shoes app and DSL methods' do
-      it {should include :para, :rect, :stack, :flow, :image, :location}
+      it {is_expected.to include :para, :rect, :stack, :flow, :image, :location}
     end
 
     describe 'it does not have access to private methods' do
-      it {should_not include :pop_style, :style_normalizer, :create}
+      it {is_expected.not_to include :pop_style, :style_normalizer, :create}
     end
 
     describe 'there are blacklisted methods which it should not include' do
-      it {should_not include :parent}
+      it {is_expected.not_to include :parent}
     end
   end
 end
@@ -376,11 +412,11 @@ describe "App registry" do
 
   it "only exposes a copy" do
     subject << double("app")
-    Shoes.apps.length.should eq(0)
+    expect(Shoes.apps.length).to eq(0)
   end
 
   context "with no apps" do
-    it { should be_empty }
+    it { is_expected.to be_empty }
   end
 
   context "with one app" do
@@ -391,7 +427,7 @@ describe "App registry" do
 
     its(:length) { should eq(1) }
     it "marks first app as main app" do
-      Shoes.main_app.should be(app)
+      expect(Shoes.main_app).to be(app)
     end
   end
 
@@ -405,7 +441,7 @@ describe "App registry" do
 
     its(:length) { should eq(2) }
     it "marks first app as main app" do
-      Shoes.main_app.should be(app_1)
+      expect(Shoes.main_app).to be(app_1)
     end
   end
 end

@@ -86,6 +86,10 @@ class Shoes
       'Shoes App: ' + @__app__.app_title
     end
     
+    def parent
+      @__app__.current_slot.parent
+    end
+
     %w(
       width height owner started? location left top absolute_left
       absolute_top rotate click release clear fullscreen fullscreen=
@@ -110,7 +114,7 @@ class Shoes
     # class definitions are evaluated top to bottom, want to have all of them
     # so define at bottom
     DELEGATE_METHODS = ((Shoes::App.public_instance_methods(false) +
-      Shoes::DSL.public_instance_methods) - DELEGATE_BLACKLIST).freeze
+                         Shoes::DSL.public_instance_methods) - DELEGATE_BLACKLIST).freeze
   end
 
 
@@ -145,7 +149,8 @@ class Shoes
       execution_blk = create_execution_block(blk)
       eval_block execution_blk
 
-      add_console
+      setup_global_keypresses
+      register_console_keypress
     end
 
     attr_reader :gui, :top_slot, :contents, :app, :dimensions,
@@ -187,10 +192,7 @@ class Shoes
     end
 
     def default_styles
-      {
-        :stroke      => Shoes::COLORS[:black],
-        :strokewidth => 1
-      }
+      Common::Style::DEFAULT_STYLES.clone
     end
 
     def in_bounds?(x, y)
@@ -257,6 +259,14 @@ class Shoes
       @resize_callbacks << blk
     end
 
+    def self.global_keypresses
+      @global_keypresses ||= {}
+    end
+
+    def self.add_global_keypress(key, &blk)
+      self.global_keypresses[key] = blk
+    end
+
     private
     def eval_block(execution_blk)
       # creating it first, then appending is important because that way
@@ -305,14 +315,16 @@ class Shoes
       self.absolute_top    = 0
     end
 
-    def add_console
-      unless RUBY_ENGINE == 'opal'
-        console = Proc.new do 
-          keypress do |key|
-            ::Shoes::Logger.setup if key == :"alt_/"
-          end
-        end
-        @app.instance_eval &console
+    def setup_global_keypresses
+      @app.keypress do |key|
+        blk = self.class.global_keypresses[key]
+        @app.instance_eval(&blk) unless blk.nil?
+      end
+    end
+
+    def register_console_keypress
+      self.class.add_global_keypress(:"alt_/") do
+        Logger.setup
       end
     end
 

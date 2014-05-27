@@ -20,16 +20,16 @@ describe Shoes::Swt::Arc do
 
   describe "basics" do
     specify "converts angle1 to degrees" do
-      subject.angle1.should eq(180.0)
+      expect(subject.angle1).to eq(180.0)
     end
 
     specify "converts angle2 to degrees" do
-      subject.angle2.should eq(90.0)
+      expect(subject.angle2).to eq(90.0)
     end
 
-    specify "delegates #wedge? to dsl object" do
+    specify "delegates #wedge to dsl object" do
       dsl.should_receive(:wedge?) { false }
-      subject.should_not be_wedge
+      expect(subject).to_not be_wedge
     end
   end
 
